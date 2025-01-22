@@ -3,6 +3,12 @@ import java.util.List;
 
 public class BinarySearchTree<T extends Comparable<T>> {
 
+    private Node<T> rootNode;
+
+    public BinarySearchTree() {
+        rootNode = null;
+    }
+
 
     /**
      * Insert a new value into the BST
@@ -10,6 +16,17 @@ public class BinarySearchTree<T extends Comparable<T>> {
      */
     public void insert(T value) {
         // TODO: Implement insertion logic
+        if(rootNode == null) {
+            rootNode = new Node(value);
+        } else {
+            boolean nodeReached = false;
+            Node currentNode = rootNode;
+            while(!nodeReached) {
+                //if()
+            }
+        }
+
+
     }
 
     /**
