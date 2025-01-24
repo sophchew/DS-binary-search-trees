@@ -1,13 +1,17 @@
-public class Node<E extends Comparable<E>> {
+public class Node<T extends Comparable<T>> {
 
     public Node leftChild;
     public Node rightChild;
-    public E data;
+    public T data;
 
-    public Node(E data) {
+    public Node(T data) {
         this.data = data;
         leftChild = null;
         rightChild = null;
+    }
+
+    public T getData() {
+        return data;
     }
 
 

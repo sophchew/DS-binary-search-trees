@@ -15,18 +15,32 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @param value The value to insert
      */
     public void insert(T value) {
-        // TODO: Implement insertion logic
+        // Implement insertion logic
         if(rootNode == null) {
             rootNode = new Node(value);
         } else {
             boolean nodeReached = false;
             Node currentNode = rootNode;
             while(!nodeReached) {
-                //if()
+                if(value.compareTo((T) currentNode.data) > 0) { // if value is greater than node value
+                    if(currentNode.rightChild == null) {
+                        currentNode.rightChild = new Node(value);
+                        nodeReached = true;
+                    } else {
+                        currentNode = currentNode.rightChild;
+                    }
+
+                } else if(value.compareTo((T) currentNode.data) < 0) { // if value is less than node value
+                    if(currentNode.leftChild == null) {
+                        currentNode.leftChild = new Node(value);
+                        nodeReached = true;
+                    } else {
+                        currentNode = currentNode.leftChild;
+                    }
+                }
             }
+            // Ignore if values are equal
         }
-
-
     }
 
     /**
@@ -36,7 +50,51 @@ public class BinarySearchTree<T extends Comparable<T>> {
      */
     public boolean remove(T value) {
         // TODO: Implement removal logic
+        if(rootNode == null) {
+            return false;
+        } else if(rootNode.data.compareTo(value) == 0) {
+            rootNode = null;
+            return true;
+        }
+        Node currentNode = rootNode;
+        boolean nodeExists  = true;
+
+        while(nodeExists) {
+            if(currentNode.data.compareTo(value) > 0) { //  if current data is greater than want to remove data, go left
+                if(currentNode.leftChild == null) { // not found if value is less than current
+                    nodeExists = false;
+                } else {
+                    if(currentNode.leftChild.data.compareTo(value) == 0) {
+                       // remove logic
+                        reorder(currentNode.leftChild);
+                        return true;
+                    } else {
+                        currentNode = currentNode.leftChild;
+                    }
+                }
+            } else {
+                if(currentNode.rightChild == null) { // not found if value is greater than current
+                    nodeExists = false;
+                } else {
+                    if(currentNode.rightChild.data.compareTo(value) == 0){
+                       //remove logic
+                        reorder(currentNode.rightChild);
+                        return true;
+                    } else {
+                        currentNode = currentNode.rightChild;
+                    }
+                }
+            }
+        }
+
         return false;
+    }
+
+    private void reorder(Node removedNode) {
+        Node replacingNode = null;
+        // go right and find next smallest value
+
+
     }
 
     /**
@@ -135,4 +193,5 @@ public class BinarySearchTree<T extends Comparable<T>> {
     public boolean isValidBST() {
         return false;
     }
+
 }
