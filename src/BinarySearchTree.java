@@ -91,9 +91,28 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private void reorder(Node removedNode) {
-        Node replacingNode = null;
-        // go right and find next smallest value
+        Node replacingNode = removedNode.leftChild;
+        if(removedNode.leftChild == null && removedNode.rightChild != null) {
+            replacingNode = removedNode.rightChild;
+        }
+        replacingNode = removedNode.leftChild;
+        Node prevNode = removedNode;
+        boolean nodeReached = false;
 
+        if(replacingNode == null) {
+
+        }
+        while(!nodeReached){
+            if(replacingNode.rightChild != null) {
+                prevNode = replacingNode;
+                replacingNode = replacingNode.rightChild;
+            } else {
+                nodeReached = true;
+            }
+        }
+
+        removedNode.data = replacingNode.data;
+        prevNode.rightChild = null;
 
     }
 
@@ -103,7 +122,38 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return true if value exists in the tree, false otherwise
      */
     public boolean contains(T value) {
-        // TODO: Implement search logic
+        // Implement search logic
+        if(rootNode == null) {
+            return false;
+        } else if(rootNode.data.compareTo(value) == 0) {
+            return true;
+        }
+        Node currentNode = rootNode;
+        boolean nodeExists  = true;
+
+        while(nodeExists) {
+            if(currentNode.data.compareTo(value) > 0) { //  if current data is greater than wanted data, go left
+                if(currentNode.leftChild == null) { // not found if value is less than current
+                    nodeExists = false;
+                } else {
+                    if(currentNode.leftChild.data.compareTo(value) == 0) {
+                        return true;
+                    } else {
+                        currentNode = currentNode.leftChild;
+                    }
+                }
+            } else {
+                if(currentNode.rightChild == null) { // not found if value is greater than current
+                    nodeExists = false;
+                } else {
+                    if(currentNode.rightChild.data.compareTo(value) == 0){
+                        return true;
+                    } else {
+                        currentNode = currentNode.rightChild;
+                    }
+                }
+            }
+        }
 
         return false;
     }
@@ -113,8 +163,16 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return The minimum value, or null if tree is empty
      */
     public T getMin() {
-        // TODO: Implement getMin logic
-        return null;
+        // Implement getMin logic
+        if(rootNode == null) {
+            return null;
+        }
+        Node currentNode = rootNode;
+        while(currentNode.leftChild != null) {
+            currentNode = currentNode.leftChild;
+        }
+
+        return (T) currentNode.data;
     }
 
     /**
@@ -123,37 +181,104 @@ public class BinarySearchTree<T extends Comparable<T>> {
      */
     public T getMax() {
         // TODO: Implement getMax logic
-        return null;
+        if(rootNode == null) {
+            return null;
+        }
+        Node currentNode = rootNode;
+        while(currentNode.rightChild != null) {
+            currentNode = currentNode.rightChild;
+        }
+
+        return (T) currentNode.data;
     }
 
     /**
      * Perform an inorder traversal of the BST
      * @return A list containing the values in inorder
      */
-    public List<T> inorderTraversal() {
+    public List<T> inorderTraversal() { // LCR
         List<T> result = new ArrayList<>();
-        // TODO: Implement inorder traversal
+        // Implement inorder traversal
+
+        if(rootNode == null) {
+            return null;
+        }
+
+        inorderRecursion(rootNode, result);
+
         return result;
+    }
+
+    private void inorderRecursion(Node node, List<T> result) {
+        // Check left node
+        if(node.leftChild != null) {
+            inorderRecursion(node.leftChild, result);
+        }
+        result.add((T)node.data); // Add current node
+
+        //Check right node
+        if(node.rightChild != null) {
+            inorderRecursion(node.rightChild, result);
+        }
     }
 
     /**
      * Perform a preorder traversal of the BST
      * @return A list containing the values in preorder
      */
-    public List<T> preorderTraversal() {
+    public List<T> preorderTraversal() { // CLR
         List<T> result = new ArrayList<>();
-        // TODO: Implement preorder traversal
+        // Implement preorder traversal
+
+        if(rootNode == null) {
+            return null;
+        }
+        preorderRecursion(rootNode, result);
+
         return result;
     }
+
+    private void preorderRecursion(Node node, List<T> result) {
+
+        result.add((T)node.data); // Add current node
+        // Check left node
+        if(node.leftChild != null) {
+            preorderRecursion(node.leftChild, result);
+        }
+        //Check right node
+        if(node.rightChild != null) {
+            preorderRecursion(node.rightChild, result);
+        }
+    }
+
 
     /**
      * Perform a postorder traversal of the BST
      * @return A list containing the values in postorder
      */
-    public List<T> postorderTraversal() {
+    public List<T> postorderTraversal() { // LRC
         List<T> result = new ArrayList<>();
-        // TODO: Implement postorder traversal
+        // Implement postorder traversal
+        if(rootNode == null) {
+            return null;
+        }
+        postorderRecursion(rootNode, result);
+
         return result;
+    }
+
+    private void postorderRecursion(Node node, List<T> result) {
+
+        // Check left node
+        if(node.leftChild != null) {
+            postorderRecursion(node.leftChild, result);
+        }
+        //Check right node
+        if(node.rightChild != null) {
+            postorderRecursion(node.rightChild, result);
+        }
+
+        result.add((T) node.data); // Add current node
     }
 
     /**
@@ -162,7 +287,30 @@ public class BinarySearchTree<T extends Comparable<T>> {
      */
     public int getHeight() {
         // TODO: Implement height calculation
-        return -1;
+        if(rootNode == null){
+            return -1;
+        }
+
+
+        return heightRecursion(0, 1, rootNode);
+    }
+
+    private int heightRecursion(int count, int maxHeightFound, Node node) {
+        int newMaxHeight = maxHeightFound;
+        if(node.rightChild == null && node.leftChild == null) {
+            if(count > maxHeightFound) {
+                newMaxHeight = count;
+            }
+        }
+        if(node.leftChild != null) {
+            heightRecursion(count+1, maxHeightFound, node.leftChild);
+        }
+        if(node.rightChild != null){
+            heightRecursion(count+1, maxHeightFound, node.rightChild);
+        }
+
+        return newMaxHeight;
+
     }
 
     /**
@@ -171,7 +319,29 @@ public class BinarySearchTree<T extends Comparable<T>> {
      */
     public int getSize() {
         // TODO: Implement size calculation
-        return 0;
+
+        return sizeRecursion(rootNode);
+    }
+
+    public int sizeRecursion(Node node){
+        if(node.rightChild == null && node.leftChild == null){
+            return 1;
+        }
+        int count = 1;
+
+        if(node.leftChild != null) {
+            count += sizeRecursion(node.leftChild);
+        }
+        if(node.rightChild != null) {
+            count += sizeRecursion(node.rightChild);
+        }
+
+        return count;
+
+
+
+
+
     }
 
     /**
@@ -179,19 +349,21 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return true if the tree has no nodes, false otherwise
      */
     public boolean isEmpty() {
-      return false;
+      return rootNode == null;
     }
 
     /**
      * Clear all nodes from the BST
      */
     public void clear() {
+        rootNode = null;
 
     }
 
     //Should return true if adheres to BST rules, false if otherwise
     public boolean isValidBST() {
         return false;
+
     }
 
 }
