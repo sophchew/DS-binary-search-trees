@@ -8,6 +8,7 @@ public class Node<T extends Comparable<T>> {
         this.data = data;
         leftChild = null;
         rightChild = null;
+        BinarySearchTree.hashmap.put("" + data, this);
     }
 
     public T getData() {

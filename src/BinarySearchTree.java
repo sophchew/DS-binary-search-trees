@@ -1,9 +1,11 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class BinarySearchTree<T extends Comparable<T>> {
 
     private Node<T> rootNode;
+    public static HashMap<String, Node> hashmap = new HashMap<>();
 
     public BinarySearchTree() {
         rootNode = null;
@@ -49,7 +51,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return true if value was found and removed, false otherwise
      */
     public boolean remove(T value) {
-        // TODO: Implement removal logic
+        // Implement removal logic
         if(rootNode == null) {
             return false;
         } else if(rootNode.data.compareTo(value) == 0) {
@@ -91,28 +93,40 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private void reorder(Node removedNode) {
-        Node replacingNode = removedNode.leftChild;
-        if(removedNode.leftChild == null && removedNode.rightChild != null) {
-            replacingNode = removedNode.rightChild;
-        }
-        replacingNode = removedNode.leftChild;
-        Node prevNode = removedNode;
-        boolean nodeReached = false;
+        // default left, if left node has a right node keep going right, if not replace node with left node value and link left node's left children
+        // if keep going right, replace node data with last right node and delink that from its parent
 
-        if(replacingNode == null) {
+        // If left node DNE, go right
+        // if right node has a left node, keep going left, if not replace node with right node value and link node's right children
+        // if keep going left, replace node data with last left node and delink it from parent node
 
-        }
-        while(!nodeReached){
-            if(replacingNode.rightChild != null) {
-                prevNode = replacingNode;
-                replacingNode = replacingNode.rightChild;
+        if(removedNode.leftChild != null){
+            Node replacingNode = removedNode.leftChild;
+            if (replacingNode.rightChild == null) {
+                removedNode.data = replacingNode.data;
+                removedNode.leftChild = replacingNode.leftChild;
             } else {
-                nodeReached = true;
+                Node currentNode = replacingNode;
+                while (currentNode.rightChild.rightChild != null) { // stopping one before the last node
+                    currentNode = currentNode.rightChild;
+                }
+                removedNode.data = currentNode.rightChild.data;
+                currentNode.rightChild = currentNode.rightChild.leftChild; // delinking last right node and linking any of its left nodes
+            }
+        } else {
+            Node replacingNode = removedNode.rightChild;
+            if(replacingNode.leftChild == null) {
+                removedNode.data = replacingNode.data;
+                removedNode.rightChild = replacingNode.rightChild;
+            } else {
+                Node currentNode = replacingNode;
+                while(currentNode.leftChild.leftChild != null) {
+                    currentNode = currentNode.leftChild;
+                }
+                removedNode.data = currentNode.leftChild.data;
+                currentNode.leftChild = currentNode.leftChild.rightChild;
             }
         }
-
-        removedNode.data = replacingNode.data;
-        prevNode.rightChild = null;
 
     }
 
@@ -180,7 +194,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return The maximum value, or null if tree is empty
      */
     public T getMax() {
-        // TODO: Implement getMax logic
+        // Implement getMax logic
         if(rootNode == null) {
             return null;
         }
@@ -286,30 +300,33 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return The height of the tree (-1 for empty tree)
      */
     public int getHeight() {
-        // TODO: Implement height calculation
+        // Implement height calculation
         if(rootNode == null){
             return -1;
         }
 
 
-        return heightRecursion(0, 1, rootNode);
+        return heightRecursion(0, rootNode);
     }
 
-    private int heightRecursion(int count, int maxHeightFound, Node node) {
-        int newMaxHeight = maxHeightFound;
-        if(node.rightChild == null && node.leftChild == null) {
-            if(count > maxHeightFound) {
-                newMaxHeight = count;
-            }
+    private int heightRecursion(int count, Node node) {
+        if(node.leftChild == null && node.rightChild == null) {
+            return count;
         }
+        int countLeft = 0;
+        int countRight = 0;
         if(node.leftChild != null) {
-            heightRecursion(count+1, maxHeightFound, node.leftChild);
+            countLeft = heightRecursion(count+1, node.leftChild);
         }
-        if(node.rightChild != null){
-            heightRecursion(count+1, maxHeightFound, node.rightChild);
+        if(node.rightChild != null) {
+            countRight = heightRecursion(count+1, node.rightChild);
         }
 
-        return newMaxHeight;
+        if(countRight > countLeft) {
+            return countRight;
+        } else {
+            return countLeft;
+        }
 
     }
 
@@ -318,12 +335,15 @@ public class BinarySearchTree<T extends Comparable<T>> {
      * @return The total number of nodes
      */
     public int getSize() {
-        // TODO: Implement size calculation
+        // Implement size calculation
+        if(rootNode == null){
+            return 0;
+        }
 
         return sizeRecursion(rootNode);
     }
 
-    public int sizeRecursion(Node node){
+    private int sizeRecursion(Node node){
         if(node.rightChild == null && node.leftChild == null){
             return 1;
         }
@@ -337,10 +357,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
         }
 
         return count;
-
-
-
-
 
     }
 
@@ -357,12 +373,37 @@ public class BinarySearchTree<T extends Comparable<T>> {
      */
     public void clear() {
         rootNode = null;
-
     }
 
     //Should return true if adheres to BST rules, false if otherwise
     public boolean isValidBST() {
-        return false;
+        if(rootNode == null) {
+            return true;
+        }
+
+        return isValidRecursion(rootNode);
+
+    }
+
+    private boolean isValidRecursion(Node node) {
+
+        if(node.leftChild != null) {
+            if(!isValidRecursion(node.leftChild)) {
+                return false;
+            }
+            if(node.leftChild.data.compareTo(node.data) >= 0 ){ //if left is greater or equal to current
+                return false;
+            }
+        }
+        if(node.rightChild != null) {
+            if(!isValidRecursion(node.rightChild)) {
+                return false;
+            }
+            if(node.rightChild.data.compareTo(node.data) <= 0 ){ //if right is less or equal to current
+                return false;
+            }
+        }
+        return true;
 
     }
 
